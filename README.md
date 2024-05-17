@@ -5,7 +5,9 @@
 
 编译与运行
 ```go
-go run gozero-julia.go julia --package somepackage --api demo/demo.api --dir outputdir
+go build -o gozero-julia.exe gozero-julia.go
+go run gozero-julia.go --api demo/demo.api --dir outputdir
+gozero-julia.exe --api demo/demo.api --dir outputdir
 ```
 
 编译成共享库
@@ -24,8 +26,8 @@ function JuliaGenCode(output_dir::String, api_file::String)::String
     return unsafe_string(res_ptr)
 end
 
-function GoZeroApiToJSON(output_dir::String, api_file::String)::String
-    res_ptr = ccall((:ExportToJSON, lib), Cstring, (Cstring, Cstring), output_dir, api_file)
+function GoZeroApiToJSON(api_file::String)::String
+    res_ptr = ccall((:ExportToJSON, lib), Cstring, (Cstring,), api_file)
     result = unsafe_string(res_ptr)
     return result
 end
@@ -33,7 +35,7 @@ output_dir = joinpath(@__DIR__, "ggoooodd")
 api_file = joinpath(@__DIR__, "demo/demo.api")
 result = JuliaGenCode(output_dir, api_file)
 println(result)
-json_str = GoZeroApiToJSON(output_dir, api_file)
+json_str = GoZeroApiToJSON(api_file)
 
 parsed_data = JSON3.read(json_str)
 println(parsed_data)

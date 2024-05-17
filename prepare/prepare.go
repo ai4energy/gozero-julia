@@ -1,13 +1,14 @@
 package prepare
 
 import (
+	"os"
+	"path/filepath"
+	"strings"
+
 	"github.com/zeromicro/go-zero/tools/goctl/api/parser"
 	"github.com/zeromicro/go-zero/tools/goctl/api/spec"
 	"github.com/zeromicro/go-zero/tools/goctl/util/ctx"
 	"github.com/zeromicro/go-zero/tools/goctl/util/pathx"
-	"os"
-	"path/filepath"
-	"strings"
 )
 
 var (
@@ -27,17 +28,15 @@ func Setup() {
 	if err = ApiSpec.Validate(); err != nil {
 		panic(err)
 	}
+}
 
-	if _, err := os.Stat(OutputDir); os.IsNotExist(err) {
-		if err = os.MkdirAll(OutputDir, 0755); err != nil {
-			panic(err)
+func PrepareOutputDir(outputDir string) error {
+	if _, err := os.Stat(outputDir); os.IsNotExist(err) {
+		if err = os.MkdirAll(outputDir, 0755); err != nil {
+			return err
 		}
 	}
-
-	RootPkg, err = GetParentPackage(OutputDir)
-	if err != nil {
-		panic(err)
-	}
+	return nil
 }
 
 func GetParentPackage(dir string) (string, error) {

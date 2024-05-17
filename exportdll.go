@@ -6,6 +6,7 @@ package main
 import "C"
 import (
 	"encoding/json"
+
 	"github.com/ai4energy/gozero-julia/cmd"
 	"github.com/ai4energy/gozero-julia/prepare"
 	"github.com/zeromicro/go-zero/tools/goctl/api/spec"
@@ -30,10 +31,9 @@ func convertToJSON(apiSpec *spec.ApiSpec) (string, error) {
 }
 
 //export ExportToJSON
-func ExportToJSON(outputDir, apiFile *C.char) *C.char {
+func ExportToJSON(apiFile *C.char) *C.char {
 	// 设置 ApiFile
 	prepare.ApiFile = C.GoString(apiFile)
-	prepare.OutputDir = C.GoString(outputDir)
 	prepare.Setup()
 
 	jsonData, err := convertToJSON(prepare.ApiSpec)
