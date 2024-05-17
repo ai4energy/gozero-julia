@@ -16,6 +16,7 @@ go build -o libgozero_julia.so -buildmode=c-shared exportdll.go
 Julia调用
 ```julia
 using Libdl
+using JSON3
 const lib = joinpath(@__DIR__, "libgozero_julia.so")
 
 function JuliaGenCode(output_dir::String, api_file::String)::String
@@ -31,7 +32,9 @@ end
 output_dir = joinpath(@__DIR__, "ggoooodd")
 api_file = joinpath(@__DIR__, "demo/demo.api")
 result = JuliaGenCode(output_dir, api_file)
-json_str = GoZeroApiToJSON(output_dir, api_file)
 println(result)
+json_str = GoZeroApiToJSON(output_dir, api_file)
+
 parsed_data = JSON3.read(json_str)
+println(parsed_data)
 ```
