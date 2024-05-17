@@ -9,12 +9,6 @@ import (
 	"github.com/ai4energy/gozero-julia/cmd"
 	"github.com/ai4energy/gozero-julia/prepare"
 	"github.com/zeromicro/go-zero/tools/goctl/api/spec"
-	"sync"
-)
-
-var (
-	jsonData string
-	mu       sync.Mutex
 )
 
 //export JuliaGenCode
@@ -26,16 +20,13 @@ func JuliaGenCode(outputDir, apiFile *C.char) *C.char {
 	return C.CString("Success")
 }
 
-// 将 ApiSpec 转换为 JSON 并存储在全局变量中
-func setJSON(apiSpec *spec.ApiSpec) error {
+// 将 ApiSpec 转换为 JSON 并返回
+func convertToJSON(apiSpec *spec.ApiSpec) (string, error) {
 	data, err := json.Marshal(apiSpec)
 	if err != nil {
-		return err
+		return "", err
 	}
-	mu.Lock()
-	jsonData = string(data)
-	mu.Unlock()
-	return nil
+	return string(data), nil
 }
 
 //export ExportToJSON
@@ -45,14 +36,12 @@ func ExportToJSON(outputDir, apiFile *C.char) *C.char {
 	prepare.OutputDir = C.GoString(outputDir)
 	prepare.Setup()
 
-	err := setJSON(prepare.ApiSpec)
+	jsonData, err := convertToJSON(prepare.ApiSpec)
 	if err != nil {
 		return C.CString(err.Error())
 	}
 
 	// 返回 JSON 数据
-	mu.Lock()
-	defer mu.Unlock()
 	return C.CString(jsonData)
 }
 
